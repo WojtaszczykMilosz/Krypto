@@ -83,22 +83,22 @@ public class DES {
         byte[] p= Operacje.getBits(klucz,PC1);
         byte[] a = new byte[4];
         byte[] b = new byte[4];
-
-
-//        System.out.println(p.length);
-//        for (byte c :p) {
+//        System.out.println("P");
+//        for (byte c : p) {
 //            System.out.print(Integer.toBinaryString(c & 255 | 256).substring(1));
 //        }
+//        System.out.println("A");
         System.arraycopy(p,0,a,0,4);
-        a = Operacje.fillZeros(a,4);
-        //ta dziwka tutaj ucina wartosc tego a
-        // a w mainie tak sie nie dzieje nie wiem czemu
+        a = Operacje.fillZeros(a,4,true);
+//        for (byte c : a) {
+//            System.out.print(Integer.toBinaryString(c & 255 | 256).substring(1));
+//        }
+//        System.out.println("B");
         System.arraycopy(p,3,b,0,4);
-        b = Operacje.fillZeros(b,4);
-        // i tu tez kurwa
-        for (byte c : b) {
-            System.out.print(Integer.toBinaryString(c & 255 | 256).substring(1));
-        }
+        b = Operacje.fillZeros(b,4,false);
+//        for (byte c : b) {
+//            System.out.print(Integer.toBinaryString(c & 255 | 256).substring(1));
+//        }
         byte[][] wygenerowane = new byte[16][48];
         byte[] ab = new byte[56];
 
@@ -106,6 +106,7 @@ public class DES {
             a = Operacje.rotateByte(a, przesunięcia[i]);
             b = Operacje.rotateByte(b, przesunięcia[i]);
 
+            System.out.println();
             System.arraycopy(a, 0, ab, 0, a.length);
             System.arraycopy(b, 0, ab, a.length, b.length);
             wygenerowane[i] = Operacje.getBits(ab,PC2);

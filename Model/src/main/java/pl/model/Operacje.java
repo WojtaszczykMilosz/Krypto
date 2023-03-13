@@ -4,6 +4,35 @@ import java.math.BigInteger;
 
 public class Operacje {
 
+
+    public static BigInteger createBig(byte[] wejscie) {
+        int ileBitow = wejscie.length * 8;
+
+        BigInteger big = new BigInteger(wejscie);
+        if (big.compareTo(BigInteger.ZERO) < 0) {
+            big = big.add(BigInteger.ONE.shiftLeft(ileBitow));
+        }
+
+        return big;
+    }
+
+
+
+    public static byte[] bigToArray(BigInteger big,int bytes){
+
+        if(big.toByteArray().length > bytes){
+            return trim(big.toByteArray());
+        } else if (big.toByteArray().length < bytes) {
+            byte[] tab;
+            big = big.setBit(bytes*8-7);
+            tab = big.toByteArray();
+            tab[0] = 0;
+            return tab;
+        } else {
+            return big.toByteArray();
+        }
+
+    }
     // to chyba dziala
     public static byte[] getBits(byte[] wejscie,byte[] ktore){
         byte[] wyjscie;
@@ -18,7 +47,7 @@ public class Operacje {
 //        for (byte c : helper.toByteArray()) {
 //            System.out.print(Integer.toBinaryString(c & 255 | 256).substring(1));
 //        }
-        System.out.println();
+//        System.out.println();
         wyjscie = helper.toByteArray();
         wyjscie = trim(wyjscie);
 //        System.out.println("wyj");
@@ -31,25 +60,16 @@ public class Operacje {
 
 
 
-    public static byte[] fillZeros(byte[] tab,int ile){
-        BigInteger help = new BigInteger(tab);
-        System.out.println("tab");
-        for (byte c : tab) {
-            System.out.print(Integer.toBinaryString(c & 255 | 256).substring(1));
-        }
-        System.out.println();
-        for (byte c : help.toByteArray()) {
-            System.out.print(Integer.toBinaryString(c & 255 | 256).substring(1));
-        }
+    public static byte[] fillZeros(byte[] tab,int ile,boolean koniec){
+        BigInteger help = createBig(tab);
 
         for (int i = 0; i < ile;i++){
-            help = help.clearBit(i);
+
+            int x = koniec ? i : (tab.length*8-1)-i;
+            help = help.clearBit(x);
         }
-//        System.out.println("wynik");
-//        for (byte c : help.toByteArray()) {
-//            System.out.print(Integer.toBinaryString(c & 255 | 256).substring(1));
-//        }
-        return help.toByteArray();
+
+        return trim(help.toByteArray());
     }
 
     // to odziwo dziala XD
@@ -80,13 +100,16 @@ public class Operacje {
     public static byte[] rotateByte(byte[] wejscie,int ile){
 
         byte[] wyjscie = new byte[wejscie.length];
-        BigInteger wej = new BigInteger(wejscie);
-        BigInteger help = new BigInteger(wyjscie);
-        for (int i = 0;i < wejscie.length; i++) {
-            if (wej.testBit((i+ile)%wejscie.length)) {
-                help.setBit(i);
+
+        BigInteger wej = createBig(wejscie);
+        BigInteger help = createBig(wyjscie);
+
+        for (int i = 0;i < wejscie.length*8; i++) {
+            if (wej.testBit((i+ile)%(wejscie.length*8))) {
+                help = help.setBit(i);
             }
         }
-        return wyjscie;
+
+        return bigToArray(help,wejscie.length);
     }
 }
