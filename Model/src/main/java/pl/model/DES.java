@@ -72,45 +72,46 @@ public class DES {
     }
 
 
+    private byte[] polaczBloki(byte[] a, byte[] b,int rozmiarA,int rozmiarB){
 
+
+        BigInteger wyjscie = new BigInteger("0");
+        BigInteger wejA = Operacje.createBig(a);
+        BigInteger wejB = Operacje.createBig(b);
+
+        for (int i = 0; i < rozmiarA; i++){
+            if (wejA.testBit(i)) {
+                wyjscie = wyjscie.setBit(i);
+            }
+        }
+
+        for (int i = 0; i < rozmiarB; i++){
+            if (wejB.testBit(i)) {
+                wyjscie = wyjscie.setBit(rozmiarA+i);
+            }
+        }
+
+        int ileBajtow = (rozmiarA+rozmiarB - 1) / 8 + 1;
+        return Operacje.bigToArray(wyjscie,ileBajtow);
+    }
 
 
     public byte[][] generujPodklucze(){
         byte[] PC1 = {57, 49, 41, 33, 25, 17, 9, 1, 58, 50, 42, 34, 26, 18, 10, 2, 59, 51, 43, 35, 27, 19, 11, 3, 60, 52, 44, 36,63, 55, 47, 39, 31, 23, 15, 7, 62, 54, 46, 38, 30, 22, 14, 6, 61, 53, 45, 37, 29, 21, 13, 5, 28, 20, 12, 4};
         byte[] PC2 = {14, 17, 11, 24, 1, 5, 3, 28, 15, 6, 21, 10, 23, 19, 12, 4, 26, 8, 16, 7, 27, 20, 13, 2, 41, 52, 31, 37, 47, 55, 30, 40, 51, 45, 33, 48, 44, 49, 39, 56, 34, 53, 46, 42, 50, 36, 29, 32};
-        byte[] przesunięcia = {1,1,2,2,2,2,2,2,1,2,2,2,2,2,2,1};
-
+        byte[] przesuniecia = {1,1,2,2,2,2,2,2,1,2,2,2,2,2,2,1};
+        int rozmiarPodKlucza = 28;
         byte[] p= Operacje.getBits(klucz,PC1);
-        byte[] a = new byte[4];
-        byte[] b = new byte[4];
-//        System.out.println("P");
-//        for (byte c : p) {
-//            System.out.print(Integer.toBinaryString(c & 255 | 256).substring(1));
-//        }
-//        System.out.println("A");
-        System.arraycopy(p,0,a,0,4);
-        a = Operacje.fillZeros(a,4,true);
-//        for (byte c : a) {
-//            System.out.print(Integer.toBinaryString(c & 255 | 256).substring(1));
-//        }
-//        System.out.println("B");
-        System.arraycopy(p,3,b,0,4);
-        b = Operacje.fillZeros(b,4,false);
-//        for (byte c : b) {
-//            System.out.print(Integer.toBinaryString(c & 255 | 256).substring(1));
-//        }
+        byte[] a = Operacje.kopiuj(p,0,rozmiarPodKlucza);
+        byte[] b = Operacje.kopiuj(p,rozmiarPodKlucza,rozmiarPodKlucza);
         byte[][] wygenerowane = new byte[16][48];
-        byte[] ab = new byte[56];
+        byte[] ab;
 
         for (int i = 0; i < 16; i++) {
-            a = Operacje.rotateByte(a, przesunięcia[i]);
-            b = Operacje.rotateByte(b, przesunięcia[i]);
-
-            System.out.println();
-            System.arraycopy(a, 0, ab, 0, a.length);
-            System.arraycopy(b, 0, ab, a.length, b.length);
+            a = Operacje.rotateBitsToLeft(a,rozmiarPodKlucza,przesuniecia[i]);
+            b = Operacje.rotateBitsToLeft(b,rozmiarPodKlucza,przesuniecia[i]);
+            ab = polaczBloki(a,b,rozmiarPodKlucza,rozmiarPodKlucza);
             wygenerowane[i] = Operacje.getBits(ab,PC2);
-
         }
 
         return wygenerowane;

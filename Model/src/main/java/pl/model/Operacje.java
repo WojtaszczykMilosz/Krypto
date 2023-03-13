@@ -2,6 +2,8 @@ package pl.model;
 
 import java.math.BigInteger;
 
+import static java.lang.Math.abs;
+
 public class Operacje {
 
 
@@ -96,20 +98,40 @@ public class Operacje {
 //        }
 //    }
 
-    //to nie wiem czy dziala
-    public static byte[] rotateByte(byte[] wejscie,int ile){
+
+    public static byte[] kopiuj(byte[] wejscie,int pozycja,int ile) {
+        int rozmiar  = (ile - 1)/8 + 1;
+        byte[] wyjscie = new byte[rozmiar];
+
+        BigInteger wej = createBig(wejscie);
+        BigInteger wyj = createBig(wyjscie);
+
+        int x = wejscie.length*8 - pozycja - 1;
+
+        for (int i = 0; i < ile; i++) {
+//            System.out.println(x-i);
+            if (wej.testBit(x - i)) {
+                wyj = wyj.setBit(ile - i - 1);
+            }
+        }
+        return bigToArray(wyj,rozmiar);
+    }
+
+
+
+    public static byte[] rotateBitsToLeft(byte[] wejscie,int dlugosc,int skok){
 
         byte[] wyjscie = new byte[wejscie.length];
 
         BigInteger wej = createBig(wejscie);
-        BigInteger help = createBig(wyjscie);
+        BigInteger wyj = createBig(wyjscie);
 
-        for (int i = 0;i < wejscie.length*8; i++) {
-            if (wej.testBit((i+ile)%(wejscie.length*8))) {
-                help = help.setBit(i);
+        for (int i = 0 ;i < dlugosc; i++) {
+            if (wej.testBit(i)) {
+                wyj = wyj.setBit((i+skok)%dlugosc);
             }
         }
 
-        return bigToArray(help,wejscie.length);
+        return bigToArray(wyj,wejscie.length);
     }
 }
