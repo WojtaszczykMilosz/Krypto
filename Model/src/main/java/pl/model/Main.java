@@ -10,21 +10,21 @@ public class Main {
 //        System.out.println(klucz.length);
 //        des.generujPodklucze();
 //        System.out.println(des.generujPodklucze()[12].length);
-        byte[] a = {5,2,114,-20};
+        byte[] a = {0,1,1,1};
         DES des  = new DES(a);
         byte[][] test = des.generujPodklucze();
 //
 //        System.out.println();
 //        byte[] test = {127,127,127,127};
 //        des.expansion(test);
-//        for (int i = 0; i < 16; i++) {
-//            System.out.println(i);
-//            for (byte c : test[i]) {
-//                System.out.print(Integer.toBinaryString(c & 255 | 256).substring(1));
-//            }
-//            System.out.println();
-
-//        }
+        for (int i = 0; i < 16; i++) {
+            System.out.println(i);
+            for (byte c : test[i]) {
+                System.out.print(Integer.toBinaryString(c & 255 | 256).substring(1));
+            }
+            System.out.println();
+//
+        }
 
 
 //

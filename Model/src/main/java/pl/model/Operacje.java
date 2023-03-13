@@ -38,6 +38,7 @@ public class Operacje {
     // to chyba dziala
     public static byte[] getBits(byte[] wejscie,byte[] ktore){
         byte[] wyjscie;
+        int ileBajtow = (ktore.length - 1) / 8 + 1;
         BigInteger helper = new BigInteger("0");
         BigInteger helper2 = new BigInteger(wejscie);
         for (int i = 0;i < ktore.length; i++) {
@@ -45,17 +46,9 @@ public class Operacje {
                 helper = helper.setBit(i);
             }
         }
-//        System.out.println("help");
-//        for (byte c : helper.toByteArray()) {
-//            System.out.print(Integer.toBinaryString(c & 255 | 256).substring(1));
-//        }
-//        System.out.println();
-        wyjscie = helper.toByteArray();
-        wyjscie = trim(wyjscie);
-//        System.out.println("wyj");
-//        for (byte c : wyjscie) {
-//            System.out.print(Integer.toBinaryString(c & 255 | 256).substring(1));
-//        }
+
+        wyjscie  = bigToArray(helper,ileBajtow);
+
         return wyjscie;
     }
 
