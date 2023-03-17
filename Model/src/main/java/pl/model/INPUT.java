@@ -23,6 +23,7 @@ public class INPUT {
 
     }
 
+
     public void wczytajKlucz()  {
         System.out.println("Podaj klucz");
         Scanner sc= new Scanner(System.in);
@@ -37,7 +38,7 @@ public class INPUT {
 
     }
 
-    public void wypiszBity(byte[] bytes){
+    public static void wypiszBity(byte[] bytes){
         BigInteger bi = new BigInteger(bytes);
         for(int i = (bytes.length * 8) - 1; i >= 0; i--){
 

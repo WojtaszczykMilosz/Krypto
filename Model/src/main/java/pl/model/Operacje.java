@@ -3,6 +3,7 @@ package pl.model;
 import java.math.BigInteger;
 
 import static java.lang.Math.abs;
+import static java.lang.Math.log;
 
 public class Operacje {
 
@@ -25,49 +26,46 @@ public class Operacje {
         if(big.toByteArray().length > bytes){
             return trim(big.toByteArray());
         } else if (big.toByteArray().length < bytes) {
-            byte[] tab;
-            big = big.setBit(bytes*8-7);
-            tab = big.toByteArray();
-            tab[0] = 0;
+            byte[] tab = new byte[bytes];
+            byte[] tab1 = big.toByteArray();
+            for (int i = bytes - tab1.length; i < bytes;i++)
+                tab[i] = tab1[i-(bytes-tab1.length)];
             return tab;
         } else {
             return big.toByteArray();
         }
 
     }
-    // to chyba dziala
+    
     public static byte[] getBits(byte[] wejscie,byte[] ktore){
-        byte[] wyjscie;
         int ileBajtow = (ktore.length - 1) / 8 + 1;
-        BigInteger helper = new BigInteger("0");
-        BigInteger helper2 = new BigInteger(wejscie);
+        byte[] wyjscie = new byte[ileBajtow];
         for (int i = 0;i < ktore.length; i++) {
-            if (helper2.testBit(ktore[i]-1)) {
-                helper = helper.setBit(i);
-            }
-        }
+            int wartosc = getBitAt(wejscie,ktore[i]-1);
+            wyjscie = setBitAt(wyjscie,i,wartosc);
 
-        wyjscie  = bigToArray(helper,ileBajtow);
+        }
 
         return wyjscie;
     }
 
+    public static int getBitAt(byte[] wej,int pos){
+        BigInteger wyj = new BigInteger(wej);
 
-
-
-    public static byte[] fillZeros(byte[] tab,int ile,boolean koniec){
-        BigInteger help = createBig(tab);
-
-        for (int i = 0; i < ile;i++){
-
-            int x = koniec ? i : (tab.length*8-1)-i;
-            help = help.clearBit(x);
-        }
-
-        return trim(help.toByteArray());
+        return wyj.testBit((wej.length*8 - 1) - pos) ? 1 : 0;
     }
 
-    // to odziwo dziala XD
+    public static byte[] setBitAt(byte[] wej,int pos,int wartosc){
+        BigInteger wyj = createBig(wej);
+        if (wartosc == 0){
+            wyj = wyj.clearBit((wej.length*8 - 1) - pos);
+        } else {
+            wyj = wyj.setBit((wej.length*8 - 1) - pos);
+        }
+        return bigToArray(wyj,wej.length);
+    }
+
+
     public static byte[] trim(byte[] trimmed){
 
         if (trimmed[0] != 0){
@@ -80,34 +78,18 @@ public class Operacje {
     }
 
 
-//    public static byte[] copyBits(byte[] wejscie,int od,int ile) {
-//        byte[] wyjscie = new byte[(ile-1)/8 + 1];
-//        BigInteger int1 = new BigInteger(wyjscie);
-//        BigInteger int2 = new BigInteger(wejscie);
-//        for (int i = od; i < wejscie.length; i++){
-//            if(int1.testBit(i)) {
-//
-//            }
-//        }
-//    }
 
 
     public static byte[] kopiuj(byte[] wejscie,int pozycja,int ile) {
         int rozmiar  = (ile - 1)/8 + 1;
         byte[] wyjscie = new byte[rozmiar];
 
-        BigInteger wej = createBig(wejscie);
-        BigInteger wyj = createBig(wyjscie);
-
-        int x = wejscie.length*8 - pozycja - 1;
-
         for (int i = 0; i < ile; i++) {
-//            System.out.println(x-i);
-            if (wej.testBit(x - i)) {
-                wyj = wyj.setBit(ile - i - 1);
-            }
+            int wartosc = getBitAt(wejscie,pozycja+i);
+            wyjscie = setBitAt(wyjscie,i,wartosc);
         }
-        return bigToArray(wyj,rozmiar);
+
+        return wyjscie;
     }
 
 
@@ -116,15 +98,21 @@ public class Operacje {
 
         byte[] wyjscie = new byte[wejscie.length];
 
-        BigInteger wej = createBig(wejscie);
-        BigInteger wyj = createBig(wyjscie);
-
         for (int i = 0 ;i < dlugosc; i++) {
-            if (wej.testBit(i)) {
-                wyj = wyj.setBit((i+skok)%dlugosc);
-            }
+            int wartosc = getBitAt(wejscie,(i+skok)%dlugosc);
+            wyjscie = setBitAt(wyjscie,i,wartosc);
         }
 
-        return bigToArray(wyj,wejscie.length);
+        return wyjscie;
+    }
+
+    public static byte[] zwroc6bitow(byte[] bytes, int numer){
+        byte[] wyj = {0};
+
+        for(int i = 0; i< bytes.length; i++){
+            wyj = Operacje.setBitAt(wyj,i + 2,Operacje.getBitAt(bytes,i + (numer * 6)));
+        }
+
+        return wyj;
     }
 }
