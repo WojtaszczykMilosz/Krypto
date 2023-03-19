@@ -6,6 +6,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
@@ -16,6 +17,7 @@ import pl.model.INPUT;
 import pl.model.PotrojnyDES;
 
 import java.io.*;
+import java.util.ResourceBundle;
 
 
 public class DesController extends Controller {
@@ -23,8 +25,16 @@ public class DesController extends Controller {
 
     PotrojnyDES desAlgorithm;
 
+    String charset = "UTF-8";
 
     File fileToOperateOn;
+    
+    byte[] tekstZaszyfrowany;
+    
+    byte[] tekstJawny;
+    
+    byte[] plikPoOperacji;
+    
 
 
     @FXML
@@ -72,52 +82,67 @@ public class DesController extends Controller {
         fileReadBtn.setVisible(!showText);
         saveFileBtn.setVisible(!showText);
         fileNameTextField.setVisible(!showText);
+
+        saveFileBtn.setVisible(false);
+        fileNameTextField.setText("");
+        fileToOperateOn = null;
+        fileNameTextField.setDisable(true);
+
     }
 
     @FXML
     void decrypt(ActionEvent event) {
+        try {
+            desAlgorithm.ustawKlucze(key1.getText().getBytes(charset),
+                    key2.getText().getBytes(charset), key3.getText().getBytes(charset));
+            if (textChoice.isDisabled()) {
 
-//            desAlgorithm = new PotrojnyDES(key1.getText().getBytes("UTF-8"),
-//                    key2.getText().getBytes("UTF-8"),key3.getText().getBytes("UTF-8"));
-//            System.out.println(new String(cipherText.getText().getBytes("UTF-8")));
-//        try {
-//            plainText.setText(new String(desAlgorithm.deszyfrujWiadomosc(desAlgorithm.getBufor()), "UTF-8"));
-//        } catch (UnsupportedEncodingException e){
-//
-//        }
+                tekstJawny = desAlgorithm.deszyfrujWiadomosc(tekstZaszyfrowany);
+                plainText.setText(new String(tekstJawny,charset));
+            } else {
+
+                byte[] file = INPUT.wczytajZpliku(fileToOperateOn.getAbsolutePath());
+                plikPoOperacji = desAlgorithm.deszyfrujWiadomosc(file);
+
+                saveFileBtn.setVisible(true);
+            }
+
+        }catch (IOException e) {
+            exceptionWindow(e);
+        }
 
     }
 
     @FXML
     void encrypt(ActionEvent event) {
-        if (textChoice.isDisabled()) {
-            try {
-                desAlgorithm = new PotrojnyDES(key1.getText().getBytes("UTF-8"),
-                        key2.getText().getBytes("UTF-8"), key3.getText().getBytes("UTF-8"));
-                cipherText.setText(new String(desAlgorithm.szyfrujWiadomosc(plainText.getText().getBytes("UTF-8"))));
-            } catch (UnsupportedEncodingException e) {
+        try {
+            desAlgorithm.ustawKlucze(key1.getText().getBytes(charset),
+                    key2.getText().getBytes(charset), key3.getText().getBytes(charset));
+            if (textChoice.isDisabled()) {
 
-            }
-        } else {
-            try {
-                desAlgorithm = new PotrojnyDES(key1.getText().getBytes("UTF-8"),
-                        key2.getText().getBytes("UTF-8"), key3.getText().getBytes("UTF-8"));
+                tekstJawny = plainText.getText().getBytes(charset);
+                tekstZaszyfrowany = desAlgorithm.szyfrujWiadomosc(tekstJawny);
+                cipherText.setText(new String(tekstZaszyfrowany,charset));
+            } else {
 
                 byte[] file = INPUT.wczytajZpliku(fileToOperateOn.getAbsolutePath());
-//                cipherText.setText(new String(desAlgorithm.szyfrujWiadomosc(plainText.getText().getBytes("UTF-8"))));
-            } catch (UnsupportedEncodingException e) {
+                plikPoOperacji = desAlgorithm.szyfrujWiadomosc(file);
 
+                saveFileBtn.setVisible(true);
             }
 
-
+        }catch (IOException e) {
+            exceptionWindow(e);
         }
+
+
     }
+
 
     File OpenFile() {
         chooser = new FileChooser();
         chooser.setTitle("Open Resource File");
         chooser.getExtensionFilters().addAll(
-                new FileChooser.ExtensionFilter("Text Files", "*.txt"),
                 new FileChooser.ExtensionFilter("All Files", "*.*"));
         return chooser.showOpenDialog(stage);
     }
@@ -184,22 +209,36 @@ public class DesController extends Controller {
         fileToOperateOn = OpenFile();
         if (fileToOperateOn != null)
             fileNameTextField.setText(fileToOperateOn.getName());
-
+        saveFileBtn.setVisible(false);
+        fileNameTextField.setDisable(false);
     }
 
     @FXML
     void saveFile(ActionEvent event) {
-        saveFile();
+        File plik = saveFile();
+        if (plik != null) {
+            INPUT.zapiszDoPliku(plik.getAbsolutePath(),plikPoOperacji);
+
+        }
     }
 
     @FXML
     void initialize(){
+        desAlgorithm = new PotrojnyDES();
         fileReadBtn.setVisible(false);
         saveFileBtn.setVisible(false);
         fileNameTextField.setVisible(false);
         fileNameTextField.setDisable(true);
     }
 
+
+    public void exceptionWindow(Exception e) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle("Błąd");
+        alert.setContentText(e.getMessage());
+        alert.setHeaderText("Wystąpił błąd");
+        alert.showAndWait();
+    }
 
 
 }

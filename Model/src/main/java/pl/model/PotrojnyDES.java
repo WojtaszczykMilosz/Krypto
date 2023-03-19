@@ -1,5 +1,6 @@
 package pl.model;
 
+import java.io.IOException;
 import java.util.Arrays;
 
 public class PotrojnyDES {
@@ -11,7 +12,7 @@ public class PotrojnyDES {
 
     byte bufor;
 
-    public PotrojnyDES(byte[] klucz1, byte[] klucz2, byte[] klucz3){
+    public PotrojnyDES(){
 //        byte[] klucz1 = new byte[8];
 //        byte[] klucz2 = new byte[8];
 //        byte[] klucz3 = new byte[8];
@@ -23,8 +24,21 @@ public class PotrojnyDES {
 //
 //        }
 
+//        if (klucz1.length != 8 || klucz2.length != 8 || klucz3.length != 8) {
+//            throw new RuntimeException("ee");
+//        }
+//        DES1 = new DES(klucz1);
+//        DES2 = new DES(klucz2);
+//        DES3 = new DES(klucz3);
+//        DES1.generujPodklucze();
+//        DES2.generujPodklucze();
+//        DES3.generujPodklucze();
+
+    }
+
+    public void ustawKlucze(byte[] klucz1, byte[] klucz2, byte[] klucz3) throws IOException{
         if (klucz1.length != 8 || klucz2.length != 8 || klucz3.length != 8) {
-            throw new RuntimeException("ee");
+            throw new IOException("Złe wartości klucza - powinny mieć 8 bajtow (UTF-8 encoding)");
         }
         DES1 = new DES(klucz1);
         DES2 = new DES(klucz2);
@@ -32,7 +46,6 @@ public class PotrojnyDES {
         DES1.generujPodklucze();
         DES2.generujPodklucze();
         DES3.generujPodklucze();
-
     }
 
     public byte[] szyfrujWiadomosc(byte[] wej){

@@ -1,5 +1,6 @@
 package pl.model;
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
@@ -49,7 +50,7 @@ public class Main {
         String  a = "01234567";
         String b = "11223344";
         String c = "klucz123";
-        String  x= "1";
+        String  x= "12345678";
 //        des.klucz = klucz;
 //        des.generujPodklucze();
 //
@@ -66,14 +67,13 @@ public class Main {
 //        byte[] pdf = INPUT.wczytajZpliku("pdf.pdf");
 //
         try {
-            PotrojnyDES des = new PotrojnyDES(a.getBytes(),b.getBytes(),c.getBytes());
-
-
+            PotrojnyDES des = new PotrojnyDES();
+            des.ustawKlucze(a.getBytes(),b.getBytes(),c.getBytes());
             szyfr = des.szyfrujWiadomosc(x.getBytes("UTF-8"));
 
             byte[] deszyfruj = des.deszyfrujWiadomosc(szyfr);
             System.out.println(new String(deszyfruj,"UTF-8"));
-        } catch (UnsupportedEncodingException e) {
+        } catch (IOException e) {
 
         }
         //INPUT.wypiszBity(szyfr);
