@@ -13,6 +13,7 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import pl.model.DES;
 import pl.model.INPUT;
+import pl.model.PotrojnyDES;
 
 import java.io.*;
 
@@ -20,19 +21,24 @@ import java.io.*;
 public class DesController extends Controller {
 
 
-    DES desAlgorithm;
+    PotrojnyDES desAlgorithm;
+
+
+    File fileToOperateOn;
+
 
     @FXML
-    private Button ElglamalSwitch;
+    private Button fileReadBtn;
+
+    @FXML
+    private Button saveFileBtn;
+
+    @FXML
+    private TextField fileNameTextField;
 
     @FXML
     private TextArea cipherText;
 
-    @FXML
-    private Button decryptButton;
-
-    @FXML
-    private Button encryptButton;
 
     @FXML
     private Button fileChoice;
@@ -60,68 +66,105 @@ public class DesController extends Controller {
         textChoice.requestFocus();
 
 
-        textChoice.setFocusTraversable(false);
-
         plainText.setVisible(showText);
         cipherText.setVisible(showText);
+
+        fileReadBtn.setVisible(!showText);
+        saveFileBtn.setVisible(!showText);
+        fileNameTextField.setVisible(!showText);
     }
 
     @FXML
     void decrypt(ActionEvent event) {
-        //desAlgorithm.SetKeys
-        //
-        //desAlgorithm.encrypt
-        //naodwrut
+
+//            desAlgorithm = new PotrojnyDES(key1.getText().getBytes("UTF-8"),
+//                    key2.getText().getBytes("UTF-8"),key3.getText().getBytes("UTF-8"));
+//            System.out.println(new String(cipherText.getText().getBytes("UTF-8")));
+//        try {
+//            plainText.setText(new String(desAlgorithm.deszyfrujWiadomosc(desAlgorithm.getBufor()), "UTF-8"));
+//        } catch (UnsupportedEncodingException e){
+//
+//        }
+
     }
 
     @FXML
     void encrypt(ActionEvent event) {
-        //desAlgorithm.SetKeys
-        //
-        //desAlgorithm.encrypt
+        if (textChoice.isDisabled()) {
+            try {
+                desAlgorithm = new PotrojnyDES(key1.getText().getBytes("UTF-8"),
+                        key2.getText().getBytes("UTF-8"), key3.getText().getBytes("UTF-8"));
+                cipherText.setText(new String(desAlgorithm.szyfrujWiadomosc(plainText.getText().getBytes("UTF-8"))));
+            } catch (UnsupportedEncodingException e) {
+
+            }
+        } else {
+            try {
+                desAlgorithm = new PotrojnyDES(key1.getText().getBytes("UTF-8"),
+                        key2.getText().getBytes("UTF-8"), key3.getText().getBytes("UTF-8"));
+
+                byte[] file = INPUT.wczytajZpliku(fileToOperateOn.getAbsolutePath());
+//                cipherText.setText(new String(desAlgorithm.szyfrujWiadomosc(plainText.getText().getBytes("UTF-8"))));
+            } catch (UnsupportedEncodingException e) {
+
+            }
+
+
+        }
     }
 
-
-
-    @FXML
-    void readKeys(ActionEvent event) {
-        INPUT input = new INPUT();
+    File OpenFile() {
         chooser = new FileChooser();
         chooser.setTitle("Open Resource File");
         chooser.getExtensionFilters().addAll(
                 new FileChooser.ExtensionFilter("Text Files", "*.txt"),
                 new FileChooser.ExtensionFilter("All Files", "*.*"));
-        File selectedFile = chooser.showOpenDialog(stage);
+        return chooser.showOpenDialog(stage);
+    }
 
-        try {
-            InputStream sin = new FileInputStream(selectedFile);
-            key1.setText(new String(sin.readAllBytes(),"UTF-8"));
 
-        } catch (IOException e) {
+    File saveFile() {
+        chooser = new FileChooser();
+        chooser.setTitle("Save File in resources");
+        chooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("All Files", "*.*"));
 
+        return chooser.showSaveDialog(stage);
+    }
+
+    @FXML
+    void readKeys(ActionEvent event) {
+        File selectedFile = OpenFile();
+        if (selectedFile != null) {
+            try {
+
+                byte[] byteTab = INPUT.wczytajZpliku(selectedFile.getAbsolutePath());
+                String text = new String(byteTab,"UTF-8");
+                String[] tab=text.split("\n");
+                key1.setText(tab[0]);
+                key2.setText(tab[1]);
+                key3.setText(tab[2]);
+            } catch (IOException e) {
+
+            }
         }
-
-
-//            key1.setText(input.)
 
     }
 
     @FXML
     void saveKeys(ActionEvent event) {
-        chooser = new FileChooser();
-        chooser.setTitle("Open Resource File");
-        chooser.getExtensionFilters().addAll(
-                new FileChooser.ExtensionFilter("Text Files", "*.txt"),
-                new FileChooser.ExtensionFilter("All Files", "*.*"));
-        File selectedFile = chooser.showSaveDialog(stage);
-        // i tu by trzeba metode napisac ktora zapisuje do pliku ale mi sie nie chce teraz
+        File plik = saveFile();
+
+        String str = String.join("\n",key1.getText(),key2.getText(),key3.getText());
+
+        if (plik != null) {
+            INPUT.zapiszDoPliku(plik.getAbsolutePath(),str.getBytes());
+
+        }
 
     }
 
     @FXML
     void switchToElglamal(ActionEvent event) {
-
-
         switchPanelTo(event,"elglamal.fxml");
 
     }
@@ -131,21 +174,31 @@ public class DesController extends Controller {
         switchShown(true);
     }
 
-
-
-
-
-    //tu na razie nie wpadlem jeszcze na pomysl jak to prrzedstawic wizualnie
-    //ale pewnie jakis przycisk z lewej do wczytania pliku i tylko moze jego nazwa
-
-    // i po zaszyfrowaniu cos ze plik zaszyfrowany jest gotowy do zapisania i tez plik
-    // i na odwrot po obu stronach wsm
     @FXML
     void fileClick(ActionEvent event) {
         switchShown(false);
     }
 
+    @FXML
+    void fileRead(ActionEvent event) {
+        fileToOperateOn = OpenFile();
+        if (fileToOperateOn != null)
+            fileNameTextField.setText(fileToOperateOn.getName());
 
+    }
+
+    @FXML
+    void saveFile(ActionEvent event) {
+        saveFile();
+    }
+
+    @FXML
+    void initialize(){
+        fileReadBtn.setVisible(false);
+        saveFileBtn.setVisible(false);
+        fileNameTextField.setVisible(false);
+        fileNameTextField.setDisable(true);
+    }
 
 
 

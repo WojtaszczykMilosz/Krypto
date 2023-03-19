@@ -40,6 +40,7 @@ public class INPUT {
 
     public static void wypiszBity(byte[] bytes){
         BigInteger bi = new BigInteger(bytes);
+
         for(int i = (bytes.length * 8) - 1; i >= 0; i--){
 
             if((i + 1) % 8 == 0 && i != (bytes.length * 8) - 1){
@@ -54,7 +55,7 @@ public class INPUT {
         String s = new String(bytes, StandardCharsets.UTF_8);
         System.out.println(s);
     }
-    public byte[] wczytajZpliku(String plik){
+    public static byte[] wczytajZpliku(String plik){
         try (
                 InputStream sin = new FileInputStream(plik);
         ) {
@@ -72,7 +73,7 @@ public class INPUT {
 
         return null;
     }
-    public void zapiszDoPliku(String plik, byte[] bytes){
+    public static void zapiszDoPliku(String plik, byte[] bytes){
         try (
                 OutputStream sou = new FileOutputStream(plik);
         ) {
@@ -83,12 +84,6 @@ public class INPUT {
         }
     }
 
-    public byte[] XOR(byte[] bytes1, byte[] bytes2){
-        BigInteger b1 = new BigInteger(bytes1);
-        BigInteger b2 = new BigInteger(bytes2);
-
-        return b1.xor(b2).toByteArray();
-    }
 
     public boolean sprawdzKlucz(){
         if(klucz.length == 8){
@@ -119,11 +114,7 @@ public class INPUT {
             }
 
             for(int i = delta; i < 8; i++){
-                if(i == 7) {
-                    out[i] = (byte)(8 - delta);
-                }else {
                     out[i] = 0;
-                }
             }
         }
         return out;

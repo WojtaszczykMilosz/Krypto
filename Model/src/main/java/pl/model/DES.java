@@ -1,11 +1,9 @@
 package pl.model;
 
-import java.math.BigInteger;
-import java.util.BitSet;
-
 public class DES {
 
     byte[] klucz;
+    byte[] tekstZaszyfrowany;
     byte[][] podklucze;
 
     public final static byte[] PC1 = {57, 49, 41, 33, 25, 17,  9,
@@ -84,60 +82,51 @@ public class DES {
     public DES(byte[] klucz) {
         this.klucz = klucz;
     }
-    public DES(){};
+
+    public DES() {}
 
 
-    private byte[] Ppermutation(byte[] bytes){
+    public byte[] permutacjaPBlock(byte[] wej){
 
-        return Operacje.getBits(bytes,Pblock);
+        return Operacje.permutacja(wej,Pblock,4 );
     }
 
 
-    private byte[] polaczBloki(byte[] a, byte[] b,int rozmiarA,int rozmiarB){
+    public byte[] permutacjaRozszerzajaca(byte[] wej){
 
-        int ileBajtow = (rozmiarA+rozmiarB - 1) / 8 + 1;
-        byte[] wyjscie = new byte[ileBajtow];
-
-
-        for (int i = 0; i < rozmiarA; i++){
-            int wartosc = Operacje.getBitAt(a,i);
-            wyjscie = Operacje.setBitAt(wyjscie,i,wartosc);
-
-        }
-
-        for (int i = 0; i < rozmiarB; i++){
-            int wartosc = Operacje.getBitAt(b,i);
-            wyjscie = Operacje.setBitAt(wyjscie,rozmiarA+i,wartosc);
-        }
-
-
-        return wyjscie;
-    }
-
-    public byte[] expansion(byte[] msg){
-        byte[] afterExpansion = Operacje.getBits(msg,PR);
-        return afterExpansion;
+        return Operacje.permutacja(wej,PR, 6);
 
     }
 
+    public byte[] permutacjaPC1(byte[] wej){
 
-    public byte[][] generujPodklucze(){
-        int rozmiarPodKlucza = 28;
-        byte[] p = Operacje.getBits(klucz,PC1);
-        byte[] a = Operacje.kopiuj(p,0,rozmiarPodKlucza);
-        byte[] b = Operacje.kopiuj(p,rozmiarPodKlucza,rozmiarPodKlucza);
-        byte[][] wygenerowane = new byte[16][48];
-        byte[] ab;
+        return Operacje.permutacja(wej,PC1, 7);
+
+    }
+
+    public byte[] permutacjaPC2(byte[] wej){
+
+        return Operacje.permutacja(wej,PC2, 6);
+
+    }
+
+    public void generujPodklucze(){
+
+        byte[] klucz56 = permutacjaPC1(klucz);
+        byte[] l = Operacje.skopiujBity(klucz56,0,28,4);
+        byte[] p = Operacje.skopiujBity(klucz56,28,28,4);
+        byte[][] wygenerowaneKlucze = new byte[16][48];
+        byte[] kluczPoPrzesunieciu;
 
         for (int i = 0; i < 16; i++) {
-            a = Operacje.rotateBitsToLeft(a,rozmiarPodKlucza,przesuniecia[i]);
-            b = Operacje.rotateBitsToLeft(b,rozmiarPodKlucza,przesuniecia[i]);
-            ab = polaczBloki(a,b,rozmiarPodKlucza,rozmiarPodKlucza);
-            wygenerowane[i] = Operacje.getBits(ab,PC2);
+            l = Operacje.przesunieciePolowekKlucza(l, przesuniecia[i]);
+            p = Operacje.przesunieciePolowekKlucza(p, przesuniecia[i]);
+            kluczPoPrzesunieciu = Operacje.polaczDwieTablice(l,p,28,7);
+            wygenerowaneKlucze[i] = permutacjaPC2(kluczPoPrzesunieciu);
 
         }
+        podklucze = wygenerowaneKlucze;
 
-        return wygenerowane;
     }
 
     public byte[] zwroc32bity(byte[] bytes){
@@ -149,23 +138,135 @@ public class DES {
             byte[] szostka = Operacje.zwroc6bitow(bytes,i);
             byte[] czworka = new byte[1];
 
-            wie = Operacje.setBitAt(wie,6,Operacje.getBitAt(szostka,2));
-            wie = Operacje.setBitAt(wie,7,Operacje.getBitAt(szostka,7));
-            kol = Operacje.setBitAt(kol,4,Operacje.getBitAt(szostka,3));
-            kol = Operacje.setBitAt(kol,5,Operacje.getBitAt(szostka,4));
-            kol = Operacje.setBitAt(kol,6,Operacje.getBitAt(szostka,5));
-            kol = Operacje.setBitAt(kol,7,Operacje.getBitAt(szostka,6));
+             Operacje.setBit(wie,6,Operacje.getBit(szostka,2));
+             Operacje.setBit(wie,7,Operacje.getBit(szostka,7));
+             Operacje.setBit(kol,4,Operacje.getBit(szostka,3));
+             Operacje.setBit(kol,5,Operacje.getBit(szostka,4));
+             Operacje.setBit(kol,6,Operacje.getBit(szostka,5));
+             Operacje.setBit(kol,7,Operacje.getBit(szostka,6));
 
 
-            czworka[0] = s_box[i][16 * wie[0] + kol[0]];
+             czworka[0] = s_box[i][16 * wie[0] + kol[0]];
 
-            wyj = Operacje.setBitAt(wyj, (i * 4),Operacje.getBitAt(czworka,4));
-            wyj = Operacje.setBitAt(wyj,1 + (i * 4),Operacje.getBitAt(czworka,5));
-            wyj = Operacje.setBitAt(wyj,2 + (i * 4),Operacje.getBitAt(czworka,6));
-            wyj = Operacje.setBitAt(wyj,3 + (i * 4),Operacje.getBitAt(czworka,7));
+             Operacje.setBit(wyj, (i * 4),Operacje.getBit(czworka,4));
+             Operacje.setBit(wyj,1 + (i * 4),Operacje.getBit(czworka,5));
+             Operacje.setBit(wyj,2 + (i * 4),Operacje.getBit(czworka,6));
+             Operacje.setBit(wyj,3 + (i * 4),Operacje.getBit(czworka,7));
 
 
 
+        }
+
+        return wyj;
+    }
+
+    public byte[] szyfrujBlok(byte[] wej){
+
+
+
+        byte[] l = Operacje.skopiujBity(wej,0,32,4);
+        byte[] p = Operacje.skopiujBity(wej,32,32,4);
+
+        for(int i = 0;i<16;i++){
+            byte[] wynikRundy = runda(l,p,i);
+            l = p;
+            p = wynikRundy;
+        }
+        return Operacje.polaczDwieTablice(p,l,32 ,8 );
+
+    }
+
+    public byte[] runda(byte[] l, byte[] p,int i){
+        byte[] r = permutacjaRozszerzajaca(p);
+        byte[] xor = Operacje.XOR(r,podklucze[i],6 );
+        byte[] s = zwroc32bity(xor);
+        byte[] pp = permutacjaPBlock(s);
+        return  Operacje.XOR(pp,l, 4);
+
+    }
+
+    public byte[] deszyfrujBlok(byte[] wej){
+
+        byte[] l = Operacje.skopiujBity(wej,0,32,4);
+        byte[] p = Operacje.skopiujBity(wej,32,32,4);
+
+        for(int i = 15;i>=0;i--){
+            byte[] wynikRundy = runda(l,p,i);
+            l = p;
+            p = wynikRundy;
+        }
+        return Operacje.polaczDwieTablice(p,l,32 ,8 );
+
+    }
+
+    public byte[] szyfrujWiadomosc(byte[] wej){
+        int maxindex = wej.length / 8;
+        boolean rwnosc = wej.length % 8 == 0;
+        byte[] wyj;
+
+        if(rwnosc){
+            wyj = new byte[wej.length];
+        } else {
+            wyj = new byte[maxindex * 8 + 9];
+        }
+
+        byte[] szyfr;
+
+        for(int i =0;i<=maxindex;i++){
+
+            if(i == maxindex && rwnosc){
+                break;
+            }
+
+            szyfr = szyfrujBlok(Operacje.zwroc64bity(i,wej));
+
+            for(int j =0;j<64;j++){
+
+                Operacje.setBit(wyj,j + (i * 64),Operacje.getBit(szyfr,j));
+            }
+
+        }
+
+        if(!rwnosc){
+
+            wyj[maxindex * 8 + 8] = (byte)( 8 - wej.length + maxindex * 8);
+        }
+
+
+
+        return wyj;
+    }
+
+    public byte[] deszyfrujWiadomosc(byte[] wej){
+        int maxindex = wej.length / 8;
+        boolean rwnosc = wej.length % 8 == 0;
+        byte[] wyj;
+        int delta = 0;
+
+        if(rwnosc){
+            wyj = new byte[wej.length];
+        } else {
+            delta = wej[maxindex * 8];
+            wyj = new byte[maxindex * 8 - delta];
+        }
+
+        byte[] deszyfr;
+
+        for(int i =0;i<maxindex;i++){
+            deszyfr = deszyfrujBlok(Operacje.zwroc64bity(i,wej));
+
+            if(i == maxindex - 1){
+                for(int j =0;j<(8-delta)*8;j++){
+
+                    Operacje.setBit(wyj,j + (i * 64),Operacje.getBit(deszyfr,j));
+                }
+            }else {
+
+                for (int j = 0; j < 64; j++) {
+
+                    Operacje.setBit(wyj, j + (i * 64), Operacje.getBit(deszyfr, j));
+                }
+            }
         }
 
         return wyj;

@@ -5,10 +5,10 @@
     <parent>
         <artifactId>krypto</artifactId>
         <groupId>pl</groupId>
-        <version>2.0</version>
+        <version>1.0-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
-    <groupId>pl.model</groupId>
+
     <artifactId>Model</artifactId>
 
     <properties>
