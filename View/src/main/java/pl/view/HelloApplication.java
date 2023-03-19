@@ -17,6 +17,7 @@ public class HelloApplication extends Application {
         Parent root = loader.load();
         Scene scene = new Scene(root);
         stage.setScene(scene);
+        stage.setResizable(false);
         stage.setTitle("Filip Szczepanek, Miłosz Wojtaszczyk Kryptografia - 3DES , elglamal");
         stage.show();
     }

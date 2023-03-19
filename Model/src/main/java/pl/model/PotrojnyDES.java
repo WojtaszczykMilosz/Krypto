@@ -10,29 +10,7 @@ public class PotrojnyDES {
     private DES DES3;
 
 
-    byte bufor;
-
     public PotrojnyDES(){
-//        byte[] klucz1 = new byte[8];
-//        byte[] klucz2 = new byte[8];
-//        byte[] klucz3 = new byte[8];
-//
-//        for(int i =0;i<64;i++){
-//            Operacje.setBit(klucz1,i,Operacje.getBit(klucz1,i));
-//            Operacje.setBit(klucz2,i,Operacje.getBit(klucz1,i + 64));
-//            Operacje.setBit(klucz3,i,Operacje.getBit(klucz1,i + 128));
-//
-//        }
-
-//        if (klucz1.length != 8 || klucz2.length != 8 || klucz3.length != 8) {
-//            throw new RuntimeException("ee");
-//        }
-//        DES1 = new DES(klucz1);
-//        DES2 = new DES(klucz2);
-//        DES3 = new DES(klucz3);
-//        DES1.generujPodklucze();
-//        DES2.generujPodklucze();
-//        DES3.generujPodklucze();
 
     }
 
@@ -48,30 +26,81 @@ public class PotrojnyDES {
         DES3.generujPodklucze();
     }
 
-    public byte[] szyfrujWiadomosc(byte[] wej){
-        bufor = -1;
+
+    public byte[] szyfrujWiadomosc(byte[] wej) {
+        int maxindex = wej.length / 8;
+        boolean rwnosc = wej.length % 8 == 0;
         byte[] wyj;
-        wyj = DES1.szyfrujWiadomosc(wej);
-        if (wyj.length % 8 != 0) {
-            bufor = wyj[wyj.length - 1];
-            wyj = Arrays.copyOf(wyj,wyj.length-1);
+
+        if(rwnosc){
+            wyj = new byte[wej.length];
+        } else {
+            wyj = new byte[maxindex * 8 + 9];
         }
 
-        wyj = DES2.deszyfrujWiadomosc(wyj);
-        wyj = DES3.szyfrujWiadomosc(wyj);
+
+        byte[] szyfr;
+
+        for(int i =0;i<=maxindex;i++){
+
+            if(i == maxindex && rwnosc){
+                break;
+            }
+
+            szyfr = DES1.szyfrujBlok(Operacje.zwroc64bity(i,wej));
+            szyfr = DES2.deszyfrujBlok(szyfr);
+            szyfr = DES3.szyfrujBlok(szyfr);
+            for(int j =0;j<64;j++){
+
+                Operacje.setBit(wyj,j + (i * 64),Operacje.getBit(szyfr,j));
+            }
+
+        }
+
+        if(!rwnosc){
+
+            wyj[maxindex * 8 + 8] = (byte)( 8 - wej.length + maxindex * 8);
+        }
+
+
 
         return wyj;
     }
 
     public byte[] deszyfrujWiadomosc(byte[] wej){
+        int maxindex = wej.length / 8;
+        boolean rwnosc = wej.length % 8 == 0;
         byte[] wyj;
-        wyj = DES3.deszyfrujWiadomosc(wej);
-        wyj = DES2.szyfrujWiadomosc(wyj);
-        if (bufor != -1){
-            wyj = Arrays.copyOf(wyj,wyj.length+1);
-            wyj[wyj.length-1] = bufor;
+        int delta = 0;
+
+        if(rwnosc){
+            wyj = new byte[wej.length];
+        } else {
+            delta = wej[maxindex * 8];
+            wyj = new byte[maxindex * 8 - delta];
         }
-        wyj = DES1.deszyfrujWiadomosc(wyj);
+
+        byte[] deszyfr;
+
+        for(int i =0;i<maxindex;i++){
+            deszyfr = DES3.deszyfrujBlok(Operacje.zwroc64bity(i,wej));
+            deszyfr = DES2.szyfrujBlok(deszyfr);
+            deszyfr = DES1.deszyfrujBlok(deszyfr);
+
+            if(i == maxindex - 1){
+                for(int j =0;j<(8-delta)*8;j++){
+
+                    Operacje.setBit(wyj,j + (i * 64),Operacje.getBit(deszyfr,j));
+                }
+            }else {
+
+                for (int j = 0; j < 64; j++) {
+
+                    Operacje.setBit(wyj, j + (i * 64), Operacje.getBit(deszyfr, j));
+                }
+            }
+        }
+
         return wyj;
     }
 
