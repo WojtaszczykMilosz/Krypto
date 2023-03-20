@@ -84,31 +84,52 @@ public class DES {
 
     public DES() {}
 
-
+    /**
+     * Metoda wykorzystywana do permutowania 32 bitów powstałych przy użyciu S-boksów
+     * @param wej wejściowa tablica 4 bajtów
+     * @return wyjściowa tablica 4 bajtów
+     */
     public byte[] permutacjaPBlok(byte[] wej){
 
         return Operacje.permutacja(wej, pBlok,4 );
     }
 
-
+    /**
+     * Wykorzystywania do rozszerzenia prawej części tekstu jawnego
+     * @param wej wejściowa tablica 4 bajtów
+     * @return wyjściowa tablica 6 bajtów
+     */
     public byte[] permutacjaRozszerzajaca(byte[] wej){
 
         return Operacje.permutacja(wej, permutacjaRozszerzajaca, 6);
 
     }
 
+    /**
+     * Wykorzystywana do permutowania klucza wejsciowego
+     * @param wej wejściowa tablica 8 bajtów
+     * @return wyjściowa tablica 7 bajtów
+     */
     public byte[] permutacjaPC1(byte[] wej){
 
         return Operacje.permutacja(wej, permutacjaPC1, 7);
 
     }
 
+    /**
+     * Wykorzystywana do permutowania klucza po przesunięciu w lewo bitów jego połówek
+     * @param wej wejściowa tablica 7 bajtów
+     * @return wyjściowa tablica 6 bajtów
+     */
     public byte[] permutacjaPC2(byte[] wej){
 
         return Operacje.permutacja(wej, permutacjaPC2, 6);
 
     }
 
+    /**
+     * Metoda generująca 16, 48 bajtowych kluczy rund
+     */
     public void generujPodklucze(){
 
         byte[] klucz56 = permutacjaPC1(klucz);
@@ -128,6 +149,11 @@ public class DES {
 
     }
 
+    /**
+     * Metoda szyfruje każde kolejne 6 bitów tablicy wejściowej przy użyciu odpowiedniego S-boksa i łączy dane wyjściowe z S-boksów w jedną tablicę 4 bajtów
+     * @param wej wejściowa tablica 6 bajtów
+     * @return wyjściowa tablica 4 bajtów
+     */
     public byte[] operacjaSBoks(byte[] wej){
 
         byte[] wyj = new byte[4];
@@ -175,6 +201,13 @@ public class DES {
 
     }
 
+    /**
+     * Jedna z 16 rund wykorzystywana przy szyfrowaniu i deszyfrowaniu wiadomości przy użyciu s szyfru DESa.
+     * @param l lewa część tekstu, tablica 4 bajtów
+     * @param p prawa część tekstu, tablica 4 bajtów
+     * @param i numer rundy
+     * @return Wynik rund w postaci tablicy 4 bajtów
+     */
     public byte[] runda(byte[] l, byte[] p,int i){
         byte[] r = permutacjaRozszerzajaca(p);
         byte[] xor = Operacje.XOR(r,podklucze[i],6 );

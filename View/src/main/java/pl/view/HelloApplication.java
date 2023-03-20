@@ -1,3 +1,8 @@
+/**
+ * Milosz Wojtaszczyk 242567
+ * Filip Szczepanek 242544
+**/
+
 package pl.view;
 
 import javafx.application.Application;
