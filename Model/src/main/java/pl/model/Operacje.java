@@ -7,7 +7,7 @@ public class Operacje {
 
     /**
      * @param wej wejściowa tablica bajtów
-     * @param permutacja tablica indeksów po permutacji
+     * @param permutacja tablica indeksów danej permutacji
      * @param ileBajt długość zwracanej tablicy
      * @return zwraca tablice bajtów, w której bajty z tablicy wej są umieszczone w kolejności zgodnej z indeksami z tablicy permutacja
      */
@@ -26,7 +26,7 @@ public class Operacje {
 
     /**
      * @param wej tablica wejściowa
-     * @param pos pozycja, której bit chcemy sprawdzić
+     * @param pos pozycja, na której chcemy sprawdzić wartosc bitu
      * @return zwraca wartość bitu w tablicy wej na pozycji pos
      */
     public static int getBit(byte[] wej, int pos){
@@ -39,7 +39,7 @@ public class Operacje {
 
     /**
      * @param wej wejściowa tablica bajtów, której bit chcemy zmienić
-     * @param pos pozycja, której bit chcemy sprawdzić
+     * @param pos pozycja, na której chcemy ustawic wartosc bitu
      * @param wartosc wartość, którą chcemy ustawić
      */
     public static void setBit(byte[] wej, int pos, int wartosc){

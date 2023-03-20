@@ -33,7 +33,7 @@ public class PotrojnyDES {
     }
 
     /**
-     * Szyfruje podaną wiadomość przy użyciu algorytmu potrójnego DESa. Jesłi jest to konieczne uzupełnia wiadomość szyfrowaną o zera, a w zwracanej tablicy dodaje
+     * Szyfruje podaną wiadomość przy użyciu algorytmu potrójnego DESa. Jeśli jest to konieczne uzupełnia wiadomość szyfrowaną o zera, a w zwracanej tablicy dodaje
      * bajt określający ilosć zer
      * @param wej wejściowa tablica bajtów
      * @return zaszyfrowana wiadomość, tablica bajtów
