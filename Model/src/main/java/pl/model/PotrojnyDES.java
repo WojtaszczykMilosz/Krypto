@@ -1,7 +1,7 @@
 package pl.model;
 
 import java.io.IOException;
-import java.util.Arrays;
+
 
 public class PotrojnyDES {
 
@@ -29,10 +29,10 @@ public class PotrojnyDES {
 
     public byte[] szyfrujWiadomosc(byte[] wej) {
         int maxindex = wej.length / 8;
-        boolean rwnosc = wej.length % 8 == 0;
+        boolean rownosc = wej.length % 8 == 0;
         byte[] wyj;
 
-        if(rwnosc){
+        if(rownosc){
             wyj = new byte[wej.length];
         } else {
             wyj = new byte[maxindex * 8 + 9];
@@ -41,24 +41,23 @@ public class PotrojnyDES {
 
         byte[] szyfr;
 
-        for(int i =0;i<=maxindex;i++){
+        for(int i = 0; i <= maxindex; i++){
 
-            if(i == maxindex && rwnosc){
+            if(i == maxindex && rownosc){
                 break;
             }
 
             szyfr = DES1.szyfrujBlok(Operacje.zwroc64bity(i,wej));
             szyfr = DES2.deszyfrujBlok(szyfr);
             szyfr = DES3.szyfrujBlok(szyfr);
-            for(int j =0;j<64;j++){
 
+            for(int j = 0; j < 64; j++){
                 Operacje.setBit(wyj,j + (i * 64),Operacje.getBit(szyfr,j));
             }
 
         }
 
-        if(!rwnosc){
-
+        if(!rownosc){
             wyj[maxindex * 8 + 8] = (byte)( 8 - wej.length + maxindex * 8);
         }
 
@@ -69,11 +68,11 @@ public class PotrojnyDES {
 
     public byte[] deszyfrujWiadomosc(byte[] wej){
         int maxindex = wej.length / 8;
-        boolean rwnosc = wej.length % 8 == 0;
+        boolean rownosc = wej.length % 8 == 0;
         byte[] wyj;
         int delta = 0;
 
-        if(rwnosc){
+        if(rownosc){
             wyj = new byte[wej.length];
         } else {
             delta = wej[maxindex * 8];
@@ -82,20 +81,19 @@ public class PotrojnyDES {
 
         byte[] deszyfr;
 
-        for(int i =0;i<maxindex;i++){
+        for(int i = 0; i < maxindex; i++){
+
             deszyfr = DES3.deszyfrujBlok(Operacje.zwroc64bity(i,wej));
             deszyfr = DES2.szyfrujBlok(deszyfr);
             deszyfr = DES1.deszyfrujBlok(deszyfr);
 
             if(i == maxindex - 1){
-                for(int j =0;j<(8-delta)*8;j++){
-
+                for(int j = 0;j < (8-delta)*8; j++){
                     Operacje.setBit(wyj,j + (i * 64),Operacje.getBit(deszyfr,j));
                 }
             }else {
 
                 for (int j = 0; j < 64; j++) {
-
                     Operacje.setBit(wyj, j + (i * 64), Operacje.getBit(deszyfr, j));
                 }
             }

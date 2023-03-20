@@ -2,22 +2,15 @@ package pl.view;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Node;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.stage.FileChooser;
-import javafx.stage.Stage;
-import pl.model.DES;
-import pl.model.INPUT;
+import pl.model.OperacjePlikowe;
 import pl.model.PotrojnyDES;
 
 import java.io.*;
-import java.util.ResourceBundle;
 
 
 public class DesController extends Controller {
@@ -101,7 +94,7 @@ public class DesController extends Controller {
                 plainText.setText(new String(tekstJawny,charset));
             } else {
 
-                byte[] file = INPUT.wczytajZpliku(fileToOperateOn.getAbsolutePath());
+                byte[] file = OperacjePlikowe.wczytajZpliku(fileToOperateOn.getAbsolutePath());
                 plikPoOperacji = desAlgorithm.deszyfrujWiadomosc(file);
 
                 saveFileBtn.setVisible(true);
@@ -125,7 +118,7 @@ public class DesController extends Controller {
                 cipherText.setText(new String(tekstZaszyfrowany,charset));
             } else {
 
-                byte[] file = INPUT.wczytajZpliku(fileToOperateOn.getAbsolutePath());
+                byte[] file = OperacjePlikowe.wczytajZpliku(fileToOperateOn.getAbsolutePath());
                 plikPoOperacji = desAlgorithm.szyfrujWiadomosc(file);
 
                 saveFileBtn.setVisible(true);
@@ -162,7 +155,7 @@ public class DesController extends Controller {
         if (selectedFile != null) {
             try {
 
-                byte[] byteTab = INPUT.wczytajZpliku(selectedFile.getAbsolutePath());
+                byte[] byteTab = OperacjePlikowe.wczytajZpliku(selectedFile.getAbsolutePath());
                 String text = new String(byteTab,"UTF-8");
                 String[] tab=text.split("\n");
                 key1.setText(tab[0]);
@@ -182,7 +175,7 @@ public class DesController extends Controller {
         String str = String.join("\n",key1.getText(),key2.getText(),key3.getText());
 
         if (plik != null) {
-            INPUT.zapiszDoPliku(plik.getAbsolutePath(),str.getBytes());
+            OperacjePlikowe.zapiszDoPliku(plik.getAbsolutePath(),str.getBytes());
 
         }
 
@@ -217,7 +210,7 @@ public class DesController extends Controller {
     void saveFile(ActionEvent event) {
         File plik = saveFile();
         if (plik != null) {
-            INPUT.zapiszDoPliku(plik.getAbsolutePath(),plikPoOperacji);
+            OperacjePlikowe.zapiszDoPliku(plik.getAbsolutePath(),plikPoOperacji);
 
         }
     }
