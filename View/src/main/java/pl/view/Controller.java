@@ -8,6 +8,7 @@ import javafx.scene.Scene;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
+import java.io.File;
 import java.io.IOException;
 
 public class Controller {
@@ -32,5 +33,22 @@ public class Controller {
         scene = new Scene(parent);
         stage.setScene(scene);
         stage.show();
+    }
+
+    File OpenFile() {
+        chooser = new FileChooser();
+        chooser.setTitle("Open Resource File");
+        chooser.getExtensionFilters().addAll(
+                new FileChooser.ExtensionFilter("All Files", "*.*"));
+        return chooser.showOpenDialog(stage);
+    }
+
+
+    File saveFile() {
+        chooser = new FileChooser();
+        chooser.setTitle("Save File in resources");
+        chooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("All Files", "*.*"));
+
+        return chooser.showSaveDialog(stage);
     }
 }

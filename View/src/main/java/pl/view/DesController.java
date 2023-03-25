@@ -132,22 +132,7 @@ public class DesController extends Controller {
     }
 
 
-    File OpenFile() {
-        chooser = new FileChooser();
-        chooser.setTitle("Open Resource File");
-        chooser.getExtensionFilters().addAll(
-                new FileChooser.ExtensionFilter("All Files", "*.*"));
-        return chooser.showOpenDialog(stage);
-    }
 
-
-    File saveFile() {
-        chooser = new FileChooser();
-        chooser.setTitle("Save File in resources");
-        chooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("All Files", "*.*"));
-
-        return chooser.showSaveDialog(stage);
-    }
 
     @FXML
     void readKeys(ActionEvent event) {
