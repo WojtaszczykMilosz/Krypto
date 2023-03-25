@@ -1,6 +1,7 @@
 package pl.model;
 
 
+import java.math.BigInteger;
 import java.util.Arrays;
 
 public class Operacje {
@@ -190,6 +191,73 @@ public class Operacje {
         }
         return wyj;
     }
+    public static byte[] bigToArray(BigInteger big,int bytes){
 
+        if(big.toByteArray().length > bytes){
+            return trim(big.toByteArray());
+        } else if (big.toByteArray().length < bytes) {
+            byte[] tab = new byte[bytes];
+            byte[] tab1 = big.toByteArray();
+            for (int i = bytes - tab1.length; i < bytes;i++)
+                tab[i] = tab1[i-(bytes-tab1.length)];
+            return tab;
+        } else {
+            return big.toByteArray();
+        }
+
+    }
+    public static byte[] trim(byte[] trimmed){
+
+        if (trimmed[0] != 0){
+            return trimmed;
+        }
+        byte[] tab = new byte[trimmed.length-1];
+        System.arraycopy(trimmed,1,tab,0,trimmed.length-1);
+
+        return tab;
+    }
+    public static  byte[] zwroc256bity(int numer,byte[] wej){
+        boolean podzielnosc = false;
+        int maxindex = wej.length / 32;
+        int reszta = wej.length % 32;
+        byte [] wyj = new byte[32];
+        if (wej.length % 32 == 0){
+            podzielnosc = true;
+        }
+        if(!podzielnosc && numer == maxindex){
+            wyj = new byte[reszta];
+            for(int i = 0; i < reszta;i++){
+                wyj[i] = wej[i + (numer * 32)];
+            }
+            return wyj;
+        }
+        for(int i =0;i<32;i++){
+            wyj[i] = wej[i + (numer * 32)];
+        }
+
+        return wyj;
+    }
+
+    public static  byte[] zwroc272bity(int numer,byte[] wej){
+        boolean podzielnosc = false;
+        int maxindex = wej.length / 34;
+        int reszta = wej.length % 34;
+        byte [] wyj = new byte[34];
+        if (wej.length % 34 == 0){
+            podzielnosc = true;
+        }
+        if(!podzielnosc && numer == maxindex){
+            wyj = new byte[reszta];
+            for(int i = 0; i < reszta;i++){
+                wyj[i] = wej[i + (numer * 34)];
+            }
+            return wyj;
+        }
+        for(int i =0;i<34;i++){
+            wyj[i] = wej[i + (numer * 34)];
+        }
+
+        return wyj;
+    }
 
 }
