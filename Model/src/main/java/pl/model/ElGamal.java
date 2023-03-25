@@ -1,5 +1,6 @@
 package pl.model;
 
+import java.io.IOException;
 import java.math.BigInteger;
 import java.util.Random;
 
@@ -9,10 +10,31 @@ public class ElGamal {
     public BigInteger x;
     public BigInteger y;
     public BigInteger pMinus1;
+
+    public String getP() {
+        return p.toString(16);
+    }
+
+    public String getG() {
+        return g.toString(16);
+    }
+
+    public String getX() {
+        return x.toString(16);
+    }
+
+    public String getY() {
+        return y.toString(16);
+    }
+
     public BigInteger k;
     public int dlugoscP = 264;
 
     public ElGamal() {
+        generujKlucze();
+    }
+
+    public void generujKlucze() {
         this.p = BigInteger.probablePrime(dlugoscP, new Random());
 
         this.g = new BigInteger(dlugoscP-5,new Random());
@@ -27,6 +49,30 @@ public class ElGamal {
             this.k = new BigInteger(dlugoscP-1,new Random());
 
         }while(!this.k.gcd(pMinus1).equals(BigInteger.ONE));
+    }
+
+    public void ustawKlucze(BigInteger p,BigInteger g,BigInteger x, BigInteger y) throws IOException{
+
+        if (p.compareTo(this.p) == 0 && g.compareTo(this.g) == 0 && x.compareTo(this.x) == 0 && y.compareTo(this.y) == 0)
+        {
+            return;
+        }
+
+        if (!p.isProbablePrime(5)) {
+            throw new IOException("p musi być liczba pierwsza");
+        } else if (p.compareTo(g) == -1 ) {
+            throw new IOException("g musi być mniejsza niż p - 1");
+        } else if (p.compareTo(x) == -1)  {
+            throw new IOException("x musi być mniejsza niż p - 1");
+        } else if (y.compareTo(g.modPow(x,p)) != 0) {
+            throw new IOException("y musi być równe g^x mod p");
+        }
+
+        this.p = p;
+        this.pMinus1 = p.subtract(BigInteger.ONE);
+        this.g = g;
+        this.x = x;
+        this.y = y;
     }
 
     public byte[] szyfrujBlok(byte[] wej){

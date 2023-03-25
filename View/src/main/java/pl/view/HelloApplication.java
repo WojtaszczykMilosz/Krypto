@@ -23,7 +23,7 @@ public class HelloApplication extends Application {
         Scene scene = new Scene(root);
         stage.setScene(scene);
         stage.setResizable(false);
-        stage.setTitle("Filip Szczepanek, Miłosz Wojtaszczyk Kryptografia - 3DES , elglamal");
+        stage.setTitle("Filip Szczepanek, Miłosz Wojtaszczyk Kryptografia - 3DES , elgamal");
         stage.show();
     }
 

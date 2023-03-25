@@ -2,28 +2,26 @@ package pl.view;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Node;
-import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
-import javafx.stage.FileChooser;
-import javafx.stage.Stage;
 import pl.model.OperacjePlikowe;
-import pl.model.PotrojnyDES;
+import pl.model.ElGamal;
 
 import java.io.File;
 import java.io.IOException;
+import java.math.BigInteger;
 
-public class ElglamalController extends Controller {
+public class ElgamalController extends Controller {
 
     @FXML
     void switchTo3Des(ActionEvent event) {
         switchPanelTo(event,"des.fxml");
     }
     String charset = "UTF-8";
+
+    ElGamal gamal;
 
     File fileToOperateOn;
 
@@ -52,13 +50,16 @@ public class ElglamalController extends Controller {
     private Button fileChoice;
 
     @FXML
-    private TextField key1;
+    private TextField x;
 
     @FXML
-    private TextField key2;
+    private TextField g;
 
     @FXML
-    private TextField key3;
+    private TextField y;
+
+    @FXML
+    private TextField p;
 
     @FXML
     private TextArea plainText;
@@ -90,13 +91,44 @@ public class ElglamalController extends Controller {
 
     @FXML
     void decrypt(ActionEvent event) {
+        try {
+            if (textChoice.isDisabled()) {
+
+                tekstJawny = gamal.deszyfrujWiadomosc(tekstZaszyfrowany);
+                plainText.setText(new String(tekstJawny,charset));
+            } else {
+
+                byte[] file = OperacjePlikowe.wczytajZpliku(fileToOperateOn.getAbsolutePath());
+                plikPoOperacji = gamal.deszyfrujWiadomosc(file);
+
+                saveFileBtn.setVisible(true);
+            }
+
+        }catch (IOException e) {
+            exceptionWindow(e);
+        }
 
 
     }
 
     @FXML
     void encrypt(ActionEvent event) {
+        try {
+            if (textChoice.isDisabled()) {
 
+                tekstJawny = plainText.getText().getBytes(charset);
+                tekstZaszyfrowany = gamal.szyfrujWiadomosc(tekstJawny);
+                cipherText.setText(new String(tekstZaszyfrowany,charset));
+            } else {
+
+                byte[] file = OperacjePlikowe.wczytajZpliku(fileToOperateOn.getAbsolutePath());
+                plikPoOperacji = gamal.szyfrujWiadomosc(file);
+                saveFileBtn.setVisible(true);
+            }
+
+        }catch (IOException e) {
+            exceptionWindow(e);
+        }
 
 
     }
@@ -111,13 +143,16 @@ public class ElglamalController extends Controller {
             try {
 
                 byte[] byteTab = OperacjePlikowe.wczytajZpliku(selectedFile.getAbsolutePath());
-                String text = new String(byteTab,"UTF-8");
+                String text = new String(byteTab,charset);
                 String[] tab=text.split("\n");
-                key1.setText(tab[0]);
-                key2.setText(tab[1]);
-                key3.setText(tab[2]);
+                x.setText(tab[0]);
+                y.setText(tab[1]);
+                g.setText(tab[2]);
+                p.setText(tab[3]);
+                gamal.ustawKlucze(new BigInteger(p.getText(),16),new BigInteger(g.getText(),16)
+                        ,new BigInteger(x.getText(),16),new BigInteger(y.getText(),16));
             } catch (IOException e) {
-
+                exceptionWindow(e);
             }
         }
 
@@ -127,7 +162,7 @@ public class ElglamalController extends Controller {
     void saveKeys(ActionEvent event) {
         File plik = saveFile();
 
-        String str = String.join("\n",key1.getText(),key2.getText(),key3.getText());
+        String str = String.join("\n",x.getText(),y.getText(),g.getText(),p.getText());
 
         if (plik != null) {
             OperacjePlikowe.zapiszDoPliku(plik.getAbsolutePath(),str.getBytes());
@@ -167,11 +202,37 @@ public class ElglamalController extends Controller {
     }
 
     @FXML
+    void confirmKeys(){
+        try {
+            gamal.ustawKlucze(new BigInteger(p.getText(),16),new BigInteger(g.getText(),16)
+                    ,new BigInteger(x.getText(),16),new BigInteger(y.getText(),16));
+        }catch (IOException e){
+            exceptionWindow(e);
+        }
+
+    }
+
+    @FXML
+    void generateKeys(){
+        gamal.generujKlucze();
+        p.setText(gamal.getP());
+        g.setText(gamal.getG());
+        x.setText(gamal.getX());
+        y.setText(gamal.getY());
+    }
+
+    @FXML
     void initialize(){
         fileReadBtn.setVisible(false);
         saveFileBtn.setVisible(false);
         fileNameTextField.setVisible(false);
         fileNameTextField.setDisable(true);
+
+        gamal = new ElGamal();
+        p.setText(gamal.getP());
+        g.setText(gamal.getG());
+        x.setText(gamal.getX());
+        y.setText(gamal.getY());
     }
 
 
