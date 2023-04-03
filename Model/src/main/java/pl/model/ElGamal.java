@@ -74,7 +74,7 @@ public class ElGamal {
     public byte[] szyfrujBlok(byte[] wej, BigInteger k){
 
         BigInteger c2 = new BigInteger(1,wej).multiply(y.modPow(k,p)).mod(p);
-        return Operacje.bigToArray(c2,34);
+        return Operacje.bigToArray(c2,33);
     }
     public byte[] deszyfrujBlok(BigInteger c1, BigInteger c2){
 
@@ -95,21 +95,21 @@ public class ElGamal {
         int ilezer = 32 - wej.length % 32;
         byte [] wyj;
         if(wej.length % 32 == 0){
-            wyj = new byte[maxindex * 34 + 34];
+            wyj = new byte[maxindex * 33 + 33];
             maxindex--;
         }else {
-            wyj = new byte[(maxindex + 1) * 34 + 34 + 1];
-            wyj[(maxindex + 1) * 34 + 34 ] = (byte) ilezer;
+            wyj = new byte[(maxindex + 1) * 33 + 33 + 1];
+            wyj[(maxindex + 1) * 33 + 33 ] = (byte) ilezer;
         }
         byte[] szyfr;
-        byte[] C = Operacje.bigToArray(c1,34);
-        for(int i = 0;i<272;i++){
+        byte[] C = Operacje.bigToArray(c1,33);
+        for(int i = 0;i<264;i++){
             Operacje.setBit(wyj,i,Operacje.getBit(C,i));
         }
         for(int i = 0;i<=maxindex;i++){
             szyfr = szyfrujBlok(Operacje.zwrocBajty(i,wej,32), k);
-            for(int j =0;j<272;j++){
-                Operacje.setBit(wyj,272 + j+(i * 272),Operacje.getBit(szyfr,j));
+            for(int j =0;j<264;j++){
+                Operacje.setBit(wyj,264 + j+(i * 264),Operacje.getBit(szyfr,j));
             }
         }
 
@@ -118,27 +118,27 @@ public class ElGamal {
 
     public byte[] deszyfrujWiadomosc(byte[] wej){
         int ilezer = 0;
-        int maxindex = wej.length / 34 - 1;
-        if(wej.length % 34 != 0){
-            maxindex = (wej.length - 1)/ 34 - 1 ;
-            ilezer = wej[(maxindex+1) * 34];
+        int maxindex = wej.length / 33 - 1;
+        if(wej.length % 33 != 0){
+            maxindex = (wej.length - 1)/ 33 - 1 ;
+            ilezer = wej[(maxindex+1) * 33];
         }
         int rozmair = ((maxindex) * 32 - ilezer);
 
         byte[] wyj = new byte[rozmair];
 
 
-        byte[] help = new byte[34];
-        for (int i = 0;i<272;i++){
+        byte[] help = new byte[33];
+        for (int i = 0;i<264;i++){
             Operacje.setBit(help,i,Operacje.getBit(wej,i));
 
         }
-        BigInteger C1 = new BigInteger(help);
+        BigInteger C1 = new BigInteger(1,help);
 
 
         for(int i =1;i<=maxindex;i++){
-            help = deszyfrujBlok(C1,new BigInteger(Operacje.zwrocBajty(i,wej,34)));
-            if(i == maxindex && wej.length % 34 != 0){
+            help = deszyfrujBlok(C1,new BigInteger(1,Operacje.zwrocBajty(i,wej,33)));
+            if(i == maxindex && wej.length % 33 != 0){
 
                 for(int j = 0;j< 256 - (ilezer * 8);j++){
                     Operacje.setBit(wyj,j+((i -1) * 256),Operacje.getBit(help,j + (ilezer * 8)));
