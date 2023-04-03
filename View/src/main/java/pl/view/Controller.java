@@ -37,6 +37,7 @@ public class Controller {
 
     File OpenFile() {
         chooser = new FileChooser();
+        chooser.setInitialDirectory(new File("."));
         chooser.setTitle("Open Resource File");
         chooser.getExtensionFilters().addAll(
                 new FileChooser.ExtensionFilter("All Files", "*.*"));
@@ -46,6 +47,7 @@ public class Controller {
 
     File saveFile() {
         chooser = new FileChooser();
+        chooser.setInitialDirectory(new File("."));
         chooser.setTitle("Save File in resources");
         chooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("All Files", "*.*"));
 
