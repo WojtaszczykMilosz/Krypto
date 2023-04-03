@@ -27,7 +27,6 @@ public class ElGamal {
         return y.toString(16);
     }
 
-    public BigInteger k;
     public int dlugoscP = 264;
 
     public ElGamal() {
@@ -45,20 +44,17 @@ public class ElGamal {
 
         this.y = this.g.modPow(x,p);
 
-        do{
-            this.k = new BigInteger(dlugoscP-1,new Random());
-
-        }while(!this.k.gcd(pMinus1).equals(BigInteger.ONE));
     }
 
-    public void ustawKlucze(BigInteger p,BigInteger g,BigInteger x, BigInteger y) throws IOException{
+    public void ustawKlucze(BigInteger p,BigInteger g,BigInteger x, BigInteger y) throws IOException {
 
-        if (p.compareTo(this.p) == 0 && g.compareTo(this.g) == 0 && x.compareTo(this.x) == 0 && y.compareTo(this.y) == 0)
-        {
+        if (p.compareTo(this.p) == 0 && g.compareTo(this.g) == 0 && x.compareTo(this.x) == 0 && y.compareTo(this.y) == 0) {
             return;
         }
 
-        if (!p.isProbablePrime(5)) {
+        if (p.bitLength() != dlugoscP) {
+            throw new IOException("p musi być długości 264 bitów");
+        } else if (!p.isProbablePrime(5)) {
             throw new IOException("p musi być liczba pierwsza");
         } else if (p.compareTo(g) == -1 ) {
             throw new IOException("g musi być mniejsza niż p - 1");
@@ -75,7 +71,7 @@ public class ElGamal {
         this.y = y;
     }
 
-    public byte[] szyfrujBlok(byte[] wej){
+    public byte[] szyfrujBlok(byte[] wej, BigInteger k){
 
         BigInteger c2 = new BigInteger(1,wej).multiply(y.modPow(k,p)).mod(p);
         return Operacje.bigToArray(c2,34);
@@ -86,6 +82,13 @@ public class ElGamal {
         return Operacje.bigToArray(wynik,32);
     }
     public byte[] szyfrujWiadomosc(byte[] wej){
+
+        BigInteger k;
+        do{
+            k = new BigInteger(dlugoscP-1,new Random());
+
+        }while(!k.gcd(pMinus1).equals(BigInteger.ONE));
+
         BigInteger c1 = g.modPow(k,p);
 
         int maxindex = wej.length / 32;
@@ -104,7 +107,7 @@ public class ElGamal {
             Operacje.setBit(wyj,i,Operacje.getBit(C,i));
         }
         for(int i = 0;i<=maxindex;i++){
-            szyfr = szyfrujBlok(Operacje.zwroc256bity(i,wej));
+            szyfr = szyfrujBlok(Operacje.zwrocBajty(i,wej,32), k);
             for(int j =0;j<272;j++){
                 Operacje.setBit(wyj,272 + j+(i * 272),Operacje.getBit(szyfr,j));
             }
@@ -134,7 +137,7 @@ public class ElGamal {
 
 
         for(int i =1;i<=maxindex;i++){
-            help = deszyfrujBlok(C1,new BigInteger(Operacje.zwroc272bity(i,wej)));
+            help = deszyfrujBlok(C1,new BigInteger(Operacje.zwrocBajty(i,wej,34)));
             if(i == maxindex && wej.length % 34 != 0){
 
                 for(int j = 0;j< 256 - (ilezer * 8);j++){

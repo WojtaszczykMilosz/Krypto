@@ -216,45 +216,24 @@ public class Operacje {
 
         return tab;
     }
-    public static  byte[] zwroc256bity(int numer,byte[] wej){
-        boolean podzielnosc = false;
-        int maxindex = wej.length / 32;
-        int reszta = wej.length % 32;
-        byte [] wyj = new byte[32];
-        if (wej.length % 32 == 0){
-            podzielnosc = true;
-        }
-        if(!podzielnosc && numer == maxindex){
-            wyj = new byte[reszta];
-            for(int i = 0; i < reszta;i++){
-                wyj[i] = wej[i + (numer * 32)];
-            }
-            return wyj;
-        }
-        for(int i =0;i<32;i++){
-            wyj[i] = wej[i + (numer * 32)];
-        }
 
-        return wyj;
-    }
-
-    public static  byte[] zwroc272bity(int numer,byte[] wej){
+    public static  byte[] zwrocBajty(int numer,byte[] wej, int ile){
         boolean podzielnosc = false;
-        int maxindex = wej.length / 34;
-        int reszta = wej.length % 34;
-        byte [] wyj = new byte[34];
+        int maxindex = wej.length / ile;
+        int reszta = wej.length % ile;
+        byte [] wyj = new byte[ile];
         if (wej.length % 34 == 0){
             podzielnosc = true;
         }
         if(!podzielnosc && numer == maxindex){
             wyj = new byte[reszta];
             for(int i = 0; i < reszta;i++){
-                wyj[i] = wej[i + (numer * 34)];
+                wyj[i] = wej[i + (numer * ile)];
             }
             return wyj;
         }
-        for(int i =0;i<34;i++){
-            wyj[i] = wej[i + (numer * 34)];
+        for(int i =0;i<ile;i++){
+            wyj[i] = wej[i + (numer * ile)];
         }
 
         return wyj;
